@@ -1,0 +1,113 @@
+/* L'Amour — Ink & Ember. Day is a members'-club letter on warm paper; at 7 PM it turns to candlelit ink. */
+
+:root {
+  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --oxblood: #8e2a2a;
+  --ember: #d9663a;
+  --ember-soft: #f0b48f;
+  --brass: #a57a3f;
+  --sage: #4f6b4a;
+  --rose: #c98b7c;
+
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-xl: 34px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Day (default) */
+.theme-day, :root {
+  --bg: #f4efe7;
+  --bg-2: #ebe3d6;
+  --surface: #fbf8f3;
+  --surface-2: #f7f1e8;
+  --ink: #17130f;
+  --ink-2: #4a4038;
+  --ink-3: #6b6055;
+  --line: rgba(23, 19, 15, 0.12);
+  --line-2: rgba(23, 19, 15, 0.22);
+  --accent: var(--oxblood);
+  --accent-ink: #fbf3ea;
+  --glow: rgba(217, 102, 58, 0.18);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px -22px rgba(70, 35, 15, 0.35), 0 2px 6px -2px rgba(70, 35, 15, 0.12);
+  --glass: rgba(251, 248, 243, 0.78);
+  --grain-opacity: 0.35;
+  color-scheme: light;
+}
+
+/* Night: the 7 PM drop, Aura's voice chamber, the date itself */
+.theme-night {
+  --bg: #120e12;
+  --bg-2: #1a141a;
+  --surface: #211a21;
+  --surface-2: #2a212a;
+  --ink: #f3ebe0;
+  --ink-2: #cdbfb2;
+  --ink-3: #a29384;
+  --line: rgba(243, 235, 224, 0.12);
+  --line-2: rgba(243, 235, 224, 0.22);
+  --accent: #e8814f;
+  --accent-ink: #1a0f0b;
+  --glow: rgba(232, 129, 79, 0.28);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 48px -24px rgba(0, 0, 0, 0.8);
+  --glass: rgba(26, 20, 26, 0.72);
+  --grain-opacity: 0.18;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: #0c0a0c;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+input, textarea, select { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; border-radius: 6px; }
+
+/* Type scale. Min UI size is 11px; body never below 15px. */
+.t-display { font-family: var(--serif); font-weight: 400; font-size: 46px; line-height: 1.02; letter-spacing: -0.015em; }
+.t-title { font-family: var(--serif); font-weight: 400; font-size: 34px; line-height: 1.06; letter-spacing: -0.01em; }
+.t-head { font-family: var(--serif); font-weight: 400; font-size: 25px; line-height: 1.15; }
+.t-quote { font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.3; }
+.t-body { font-size: 16px; line-height: 1.55; }
+.t-callout { font-size: 14px; line-height: 1.45; }
+.t-small { font-size: 13px; line-height: 1.4; }
+.t-label { font-size: 11.5px; line-height: 1.2; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; }
+.t-num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.i { font-style: italic; }
+.serif { font-family: var(--serif); font-weight: 400; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+.accent { color: var(--accent); }
+.center { text-align: center; }
+.balance { text-wrap: balance; }
+.pretty { text-wrap: pretty; }
+
+/* Layout helpers */
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1; min-width: 0; }
+.gap-4 { gap: 4px; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; } .gap-20 { gap: 20px; } .gap-24 { gap: 24px; } .gap-32 { gap: 32px; }
+.between { justify-content: space-between; }
+.pad { padding-left: 22px; padding-right: 22px; }
+.hairline { height: 1px; background: var(--line); border: 0; margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
