@@ -97,7 +97,7 @@ export const PERSONAS: Record<string, Persona> = {
     traits: {
       values: [4.5, 4.8, 4.4, 4.6, 3.0, 3.5, 2.5, 2.6, 5.0, 4.6], anxiety: 3.0, avoidance: 2.8, extraversion: 0.78, openness: 0.7,
       conflict: 'balanced', replyMins: 15, msgLen: 1, humour: 0.9,
-      lifestyle: { kids: 'open', drinks: 'socially', smokes: false, faith: 2, relocate: 'no' },
+      lifestyle: { kids: 'open', drinks: 'socially', smokes: false, faith: 3, relocate: 'no' },
       interests: ['jazz', 'music', 'cooking', 'basketball', 'museums', 'long walks'],
     },
     photos: p('marcus'),

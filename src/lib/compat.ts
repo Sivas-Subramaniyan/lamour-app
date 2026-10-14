@@ -84,7 +84,7 @@ export type Learned = { likes: string[]; avoids: string[]; interactions: number 
 /** me/them traits, how complete my profile is (0–1), and what Aura has learned from my behaviour. */
 export function fit(me: Traits, them: Traits, completeness: number, learned: Learned, names = { them: 'they' }): Fit {
   const ld = lifeDesign(me.lifestyle, them.lifestyle)
-  const values = clamp(0.6 * ((centredCosine(me.values, them.values) + 1) / 2) + 0.4 * ld.score)
+  const values = clamp(0.6 * clamp(centredCosine(me.values, them.values)) + 0.4 * ld.score)
 
   const hits = them.interests.filter(i => learned.likes.includes(i)).length
   const misses = them.interests.filter(i => learned.avoids.includes(i)).length
@@ -99,7 +99,7 @@ export function fit(me: Traits, them: Traits, completeness: number, learned: Lea
   const pursueWithdraw = (me.conflict === 'pursue' && them.conflict === 'withdraw') || (me.conflict === 'withdraw' && them.conflict === 'pursue')
   if (pursueWithdraw) security -= 0.12
   if (secure(me) || secure(them)) security += 0.08
-  security = clamp(security)
+  security = clamp(security, 0, pursueWithdraw ? 0.78 : 1)
 
   const lifestyle = clamp(1 - (Math.abs(me.extraversion - them.extraversion) + Math.abs(me.openness - them.openness)) / 2)
 
@@ -114,7 +114,7 @@ export function fit(me: Traits, them: Traits, completeness: number, learned: Lea
   const lci = (Object.keys(scores) as Dimension[]).reduce((s, k) => s + weights[k] * scores[k], 0) / wsum
 
   const confidence = clamp(0.25 + 0.55 * completeness + 0.2 * clamp(learned.interactions / 30))
-  const band: Band = lci >= 0.75 && confidence >= 0.6 ? 'Strong' : lci >= 0.62 ? 'Promising' : 'Exploratory'
+  const band: Band = lci >= 0.85 && confidence >= 0.6 ? 'Strong' : lci >= 0.72 ? 'Promising' : 'Exploratory'
 
   const shared = topValues(me, 3).filter(v => topValues(them, 3).includes(v))
   const commonInterests = me.interests.filter(i => them.interests.includes(i))
@@ -194,8 +194,9 @@ export function fit(me: Traits, them: Traits, completeness: number, learned: Lea
 
   const dims = (Object.keys(scores) as Dimension[]).filter(d => weights[d] > 0)
   const contrib = (d: Dimension) => weights[d] * (scores[d] - 0.6)
-  const reasons = [...dims].sort((a, b) => contrib(b) - contrib(a)).slice(0, 3).map(d => reasonFor[d]())
-  const efforts = [...dims].sort((a, b) => scores[a] - scores[b]).filter(d => scores[d] < 0.8).slice(0, 2).map(d => effortFor[d]())
+  const effortDims = [...dims].sort((a, b) => scores[a] - scores[b]).filter(d => scores[d] < 0.8).slice(0, 2)
+  const reasons = dims.filter(d => !effortDims.includes(d)).sort((a, b) => contrib(b) - contrib(a)).slice(0, 3).map(d => reasonFor[d]())
+  const efforts = effortDims.map(d => effortFor[d]())
 
   return { lci, band, confidence, scores, reasons, efforts }
 }
