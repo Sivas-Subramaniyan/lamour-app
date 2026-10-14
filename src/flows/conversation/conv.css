@@ -1,0 +1,101 @@
+/* B · The First Conversation. Every class is prefixed cv-. Italic serif = Aura's voice. */
+
+.cv-head { display: flex; align-items: center; justify-content: space-between; height: 52px; flex-shrink: 0; position: relative; z-index: 6; }
+.cv-ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--surface); color: var(--ink-2); flex-shrink: 0; box-shadow: inset 0 0 0 1px var(--line); }
+.cv-press { transition: transform 0.18s var(--ease); }
+.cv-press:active { transform: scale(0.985); }
+
+/* Aura's words arrive one at a time */
+.cv-w { opacity: 0.1; filter: blur(3px); transition: opacity 0.45s var(--ease-out), filter 0.45s var(--ease-out); }
+.cv-w.on { opacity: 1; filter: none; }
+
+.cv-dots { display: inline-flex; align-items: center; gap: 6px; height: 20px; }
+.cv-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); animation: cv-dot 1.2s ease-in-out infinite; }
+.cv-dots i:nth-child(2) { animation-delay: 0.16s; }
+.cv-dots i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes cv-dot { 0%, 80%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+.cv-live { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.cv-live::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--ember); animation: cv-pulse 1.4s ease-in-out infinite; }
+@keyframes cv-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 102, 58, 0.55); } 50% { box-shadow: 0 0 0 6px rgba(217, 102, 58, 0); } }
+
+/* Aura home: the orb you hold */
+.cv-orb { position: relative; width: 216px; height: 216px; border-radius: 50%; display: grid; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.cv-orb::before, .cv-orb::after { content: ''; position: absolute; inset: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(232, 129, 79, 0.35); animation: cv-ring 5s ease-out infinite; pointer-events: none; }
+.cv-orb::after { animation-delay: 2.5s; }
+.cv-orb.holding::before, .cv-orb.holding::after { animation-duration: 1.6s; box-shadow: inset 0 0 0 1.5px rgba(232, 129, 79, 0.6); }
+@keyframes cv-ring { 0% { transform: scale(0.7); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(1.14); opacity: 0; } }
+.cv-orb-caption { height: 28px; display: grid; place-items: center; }
+.cv-heard-live { min-height: 26px; max-width: 320px; text-align: center; font-size: 16px; line-height: 1.45; }
+
+.cv-asked { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.cv-aura-text { font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.32; margin: 0; text-wrap: pretty; }
+.cv-point { padding-left: 14px; border-left: 1.5px solid rgba(217, 102, 58, 0.45); }
+
+/* Composer (Aura home, written chapter) */
+.cv-composer { display: flex; gap: 8px; align-items: flex-end; }
+.cv-composer .input { flex: 1; min-width: 0; height: 48px; border-radius: 24px; font-size: 16px; padding: 0 18px; }
+.cv-composer textarea.cv-ta { height: auto; min-height: 48px; max-height: 120px; padding: 12px 18px; resize: none; line-height: 1.45; field-sizing: content; }
+.cv-composer .input:disabled { opacity: 0.55; }
+.cv-send { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
+.cv-send:active { transform: scale(0.94); }
+.cv-send:disabled { opacity: 0.3; pointer-events: none; }
+.cv-send.commit { background: var(--oxblood); color: #fbf3ea; }
+
+/* The chamber */
+.cv-progress { display: flex; gap: 5px; }
+.cv-progress i { width: 20px; height: 3px; border-radius: 2px; background: var(--line-2); transition: background 0.4s; }
+.cv-progress i.on { background: var(--accent); }
+.cv-progress i.now { background: var(--ink-2); }
+.cv-q-wrap { display: block; width: 100%; text-align: center; cursor: default; }
+.cv-q { font-family: var(--serif); font-style: italic; font-size: 27px; line-height: 1.22; margin: 0; min-height: 100px; text-wrap: balance; transition: opacity 0.4s; }
+.cv-stage { position: relative; display: grid; place-items: center; transition: height 0.5s var(--ease-out); }
+.cv-stage-glow { position: absolute; width: 270px; height: 270px; border-radius: 50%; background: radial-gradient(circle, var(--glow), transparent 64%); pointer-events: none; }
+.cv-off { position: absolute; left: -22px; right: -22px; top: 50%; margin-top: -26px; height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--serif); font-style: italic; font-size: 19px; background: var(--surface-2); box-shadow: inset 0 1px 0 var(--line), inset 0 -1px 0 var(--line); }
+.cv-state { height: 30px; display: grid; place-items: center; }
+.cv-transcript { min-height: 54px; max-width: 330px; text-align: center; font-size: 17px; line-height: 1.5; color: var(--ink); }
+.cv-transcript .interim { color: var(--ink-3); }
+.cv-caret { display: inline-block; width: 2px; height: 1.05em; background: var(--ember); vertical-align: -3px; margin-left: 2px; animation: cv-blink 1s steps(2) infinite; }
+@keyframes cv-blink { 50% { opacity: 0; } }
+.cv-hold { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; font-size: 13.5px; font-weight: 550; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition: background 0.2s, color 0.2s; }
+.cv-hold.on { background: var(--ink); color: var(--bg); box-shadow: none; }
+.cv-item-wrap { padding-top: 14px; border-top: 1px solid var(--line); }
+.cv-item { font-family: var(--serif); font-size: 23px; line-height: 1.3; text-align: center; margin: 0; text-wrap: balance; }
+
+/* Written chapter */
+.cv-bub { max-width: 86%; padding: 12px 16px; border-radius: 20px; }
+.cv-bub.aura { align-self: flex-start; font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.32; border-bottom-left-radius: 6px;
+  background: linear-gradient(160deg, rgba(217, 102, 58, 0.09), rgba(217, 102, 58, 0.02) 60%), var(--surface); box-shadow: inset 0 0 0 1px rgba(217, 102, 58, 0.24); }
+.cv-bub.me { align-self: flex-end; background: var(--ink); color: var(--bg); font-size: 15.5px; line-height: 1.45; border-bottom-right-radius: 6px; }
+.cv-bub.me.skipped { background: transparent; color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line-2); font-style: italic; }
+.cv-bub-typing { padding: 12px 18px; }
+.cv-bub-item { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-style: normal; font-size: 20px; }
+.cv-inline-scale { padding: 4px 0 2px; }
+
+/* Here's what I heard */
+.cv-heard-body { position: relative; }
+.cv-strike { position: absolute; left: -6px; right: -6px; top: 50%; height: 2px; border-radius: 2px; background: var(--oxblood); transform-origin: left center; rotate: -1.5deg; }
+.cv-btn-sage { background: var(--sage); color: #f6f2ea; box-shadow: 0 8px 20px -12px rgba(79, 107, 74, 0.8); }
+
+/* Chapter book */
+.cv-chap { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: start; width: 100%; padding: 16px 0; text-align: left; border-top: 1px solid var(--line); }
+.cv-chap:last-child { border-bottom: 1px solid var(--line); }
+.cv-roman { font-family: var(--serif); font-size: 18px; line-height: 1.5; color: var(--ink-3); }
+.cv-check { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(79, 107, 74, 0.14); color: var(--sage); margin-top: 2px; }
+
+/* Life design */
+.cv-topic { padding-top: 20px; border-top: 1px solid var(--line); }
+
+/* The Working */
+.cv-wrow { display: grid; grid-template-columns: 58px 1fr auto; grid-template-rows: auto auto; align-items: baseline; column-gap: 12px; row-gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cv-wraw { font-size: 22px; }
+.cv-wres { grid-row: 1 / span 2; grid-column: 3; align-self: center; font-size: 36px; line-height: 1; color: var(--ink); }
+.cv-wsum { grid-column: 2; font-size: 12.5px; }
+.cv-wtotal { padding: 18px 0 4px; text-align: center; font-size: 18px; color: var(--ink-2); letter-spacing: 0.02em; }
+.cv-lp { font-family: var(--serif); font-size: 112px; line-height: 0.95; color: var(--accent); text-shadow: 0 0 44px rgba(232, 129, 79, 0.45); }
+.cv-folio { display: flex; gap: 14px; padding: 18px 0; }
+.cv-folio + .cv-folio { border-top: 1px solid var(--line); }
+.cv-folio-n { width: 52px; flex-shrink: 0; font-family: var(--serif); font-size: 44px; line-height: 1; color: var(--ink); }
+.cv-folio-n.accent { color: var(--accent); }
+.cv-ring { transform-box: fill-box; transform-origin: center; animation: cv-spin 40s linear infinite; }
+@keyframes cv-spin { to { transform: rotate(360deg); } }

@@ -180,6 +180,10 @@ export function proposalsFor(s: State, id: string, weekOffset = 0): Proposal[] {
   return picks.map((venueId, i) => ({ venueId, when: slots[i], minsMe: mins[i][0], minsThem: mins[i][1] }))
 }
 
+/** Demo times are local, zone-less ISO strings; keep them local (toISOString alone would shift them to UTC). */
+export const localIso = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 19)
+const plusHours = (at: string, h: number) => localIso(new Date(new Date(at).getTime() + h * 3600e3))
+
 let seq = 0
 const uid = (p: string) => `${p}${Date.now().toString(36)}${(seq++).toString(36)}`
 
@@ -193,7 +197,7 @@ export function decide(s: State, id: string, d: Decision, reasons: string[] = []
 /** Both leaned in: a chair fills and the 72-hour arc starts. */
 export function introduce(s: State, id: string, at = PHASE_TIME.dusk): State {
   if (s.connections.some(c => c.id === id)) return s
-  const until = new Date(new Date(at).getTime() + 72 * 3600e3).toISOString().slice(0, 19)
+  const until = plusHours(at, 72)
   return {
     ...s,
     connections: [...s.connections, { id, stage: 'introduced', since: at, yourTurnUntil: until }],
@@ -205,7 +209,7 @@ export function introduce(s: State, id: string, at = PHASE_TIME.dusk): State {
 export function send(s: State, id: string, m: Omit<Message, 'id' | 'at'>, at = PHASE_TIME.dusk): State {
   const msgs = [...(s.messages[id] ?? []), { ...m, id: uid('m'), at }]
   // Your Turn: sending passes the turn to them; their message gives you 48 hours.
-  const turn = m.from === 'me' ? undefined : m.from === 'them' ? new Date(new Date(at).getTime() + 48 * 3600e3).toISOString().slice(0, 19) : null
+  const turn = m.from === 'me' ? undefined : m.from === 'them' ? plusHours(at, 48) : null
   const connections = s.connections.map(c => {
     if (c.id !== id) return c
     const stage = c.stage === 'introduced' ? ('talking' as Stage) : c.stage

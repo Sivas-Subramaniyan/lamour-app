@@ -65,6 +65,7 @@
 .statusbar { position: absolute; top: 0; left: 0; right: 0; height: 54px; padding: 18px 32px 0 44px; display: flex; justify-content: space-between; align-items: center; z-index: 150; pointer-events: none; color: var(--ink); background: transparent; }
 .statusbar.theme-day, .statusbar.theme-night { background: transparent; }
 .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: var(--ink); opacity: 0.85; z-index: 150; pointer-events: none; }
+.viewport.fullscreen .topbar { padding-right: 46px; }
 .proto-fab { position: absolute; top: calc(var(--safe-top) - 14px); right: 10px; z-index: 160; width: 30px; height: 30px; border-radius: 999px; display: grid; place-items: center; color: var(--ink-2); background: var(--glass); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px var(--line); opacity: 0.75; }
 
 .tabbar {

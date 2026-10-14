@@ -113,4 +113,4 @@ export function chime() {
   } catch {}
 }
 
-export const haptic = (pattern: number | number[] = 12) => navigator.vibrate?.(pattern)
+export const haptic = (pattern: number | number[] = 12) => (navigator as any).userActivation?.hasBeenActive && navigator.vibrate?.(pattern)

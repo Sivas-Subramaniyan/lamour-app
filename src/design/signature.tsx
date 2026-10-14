@@ -44,15 +44,23 @@ export function Signature({ layers, size = 260, agitation = 0, grains = 1700, ro
     const inside = (x: number, y: number) => !round || (x - 0.5) ** 2 + (y - 0.5) ** 2 < 0.235
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
 
+    // Each frame: a damped Newton step toward the nodal line f = 0, plus jitter (more while agitated, a little always so lines stay grainy).
     const step = (k: number) => {
+      const jitter = agit.current * 0.06 + (settle ? 0.0025 : 0.01)
+      const pull = k * (0.16 * (1 - Math.min(1, agit.current * 1.6)))
       layers.forEach((l, li) => {
+        const [n, m] = l.modes
+        const nP = n * Math.PI, mP = m * Math.PI
         const a = pts[li]
         for (let i = 0; i < a.length; i += 2) {
           let x = a[i], y = a[i + 1]
-          const amp = Math.abs(chladni(l.modes[0], l.modes[1], x, y))
-          const s = amp * 0.045 * k + agit.current * 0.05 + (settle ? 0.0012 : 0.006)
-          x += (Math.random() - 0.5) * s
-          y += (Math.random() - 0.5) * s
+          const f = chladni(n, m, x, y)
+          const fx = -nP * Math.sin(nP * x) * Math.cos(mP * y) + mP * Math.sin(mP * x) * Math.cos(nP * y)
+          const fy = -mP * Math.cos(nP * x) * Math.sin(mP * y) + nP * Math.cos(mP * x) * Math.sin(nP * y)
+          const g2 = fx * fx + fy * fy + 1e-6
+          const sx = Math.max(-0.03, Math.min(0.03, (-f * fx) / g2)), sy = Math.max(-0.03, Math.min(0.03, (-f * fy) / g2))
+          x += sx * pull + (Math.random() - 0.5) * jitter
+          y += sy * pull + (Math.random() - 0.5) * jitter
           if (!inside(x, y) || x < 0 || x > 1 || y < 0 || y > 1) { x = Math.random(); y = Math.random() }
           a[i] = x; a[i + 1] = y
         }
