@@ -5,6 +5,7 @@ import type { Traits, Learned } from '../lib/compat'
 import { fit } from '../lib/compat'
 import { CAST, PERSONAS, type Gender, type Intent } from '../data/personas'
 import { chart } from '../lib/numerology'
+import { PHOTOS } from '../data/photos'
 import type { ScreenId } from '../shell/screens'
 
 export type ChapterId = 'story' | 'people' | 'life' | 'love' | 'hard' | 'care' | 'numbers'
@@ -33,6 +34,7 @@ export type Plan = {
   options: Proposal[]; chosen?: number
   mySeal?: boolean; theirSeal?: boolean
   passNo: string; lateNotice?: boolean; checkedIn?: boolean
+  checkInMins?: number; holdUntil?: string; surprise?: boolean
 }
 export type Notice = { id: string; title: string; body: string; at: string; screen?: ScreenId; params?: Record<string, any>; read?: boolean }
 export type Phase = 'afternoon' | 'dusk' | 'date-night' | 'morning-after'
@@ -41,13 +43,16 @@ export type State = {
   v: 1
   onboarded: boolean
   me: {
-    name: string; birthName: string; dob: string; gender: Gender; seeking: 'men' | 'women' | 'everyone'; intent: Intent; city: string
+    name: string; birthName: string; dob: string; gender: Gender | 'self'; genderSelf?: string; languages?: string[]; seeking: 'men' | 'women' | 'everyone'; intent: Intent; city: string
     photos: string[]; prompts: { label: string; answer: string }[]
     verified: { selfie: boolean; id: boolean; work: boolean }
     memberNo: number; voice: 'Warm' | 'Bright' | 'Low'; mode: 'voice' | 'text' | 'quiet'
     tier: 'invitation' | 'soiree' | 'maison'; resonance: 'off' | 'light' | 'meaningful'; datePasses: number
     traits: Traits
+    you?: Record<string, any> // You-flow extras (shared lens, trait flags, foreword edits)
   }
+  lifeDesign?: Record<string, { answer: string; firmness: 'hard' | 'flexible' | 'any' }>
+  chapterTurn?: Partial<Record<ChapterId, number>> // resume mid-chapter
   consents: Record<ConsentKey, boolean>
   chapters: Record<ChapterId, 'todo' | 'done'>
   heard: HeardCard[]
@@ -62,7 +67,7 @@ export type State = {
   guardians: { name: string; relation: string; on: boolean }[]
   discreet: { veil: boolean; screenshotShield: boolean; hideNames: boolean; blocked: number; sabbatical: boolean }
   notifications: Notice[]
-  settings: { auraMuted: boolean }
+  settings: { auraMuted: boolean; quietHours?: string } // quiet hours default '10 PM–9 AM'
 }
 
 export const PHASE_TIME: Record<Phase, string> = {
@@ -80,6 +85,15 @@ const ME_TRAITS: Traits = {
   interests: ['ceramics', 'design', 'jazz', 'long walks', 'cooking', 'museums', 'film'],
 }
 
+const SEED_CHATS: Record<string, Message[]> = {
+  chloe: [
+    { id: 'm1', from: 'aura', kind: 'system', text: 'Introduced Monday · Your Turn rules apply', at: '2026-10-12T19:02:00' },
+    { id: 'm2', from: 'them', kind: 'voice', secs: 17, text: 'Hi. Aura says you invented a glaze by accident. I once found a pressed violet in a 1902 travel guide and spent a whole afternoon trying to work out who put it there.', at: '2026-10-12T20:10:00' },
+    { id: 'm3', from: 'me', kind: 'text', text: 'That is the best possible use of an afternoon. Did you find out?', at: '2026-10-12T20:31:00' },
+    { id: 'm4', from: 'them', kind: 'text', text: 'A honeymooning schoolteacher from Ohio, I think. The handwriting in the margins gave her away.', at: '2026-10-13T08:15:00' },
+  ],
+}
+
 export function initialState(seeking: State['me']['seeking'] = 'men'): State {
   const cast = CAST[seeking]
   return {
@@ -87,7 +101,7 @@ export function initialState(seeking: State['me']['seeking'] = 'men'): State {
     onboarded: true,
     me: {
       name: 'Ananya', birthName: 'Ananya Rao', dob: '1997-02-14', gender: 'woman', seeking, intent: 'long-term', city: 'New York',
-      photos: [], prompts: [
+      photos: [PHOTOS.ananya.portrait.url, PHOTOS.ananya.portrait2!.url], prompts: [
         { label: 'A Sunday, ideally', answer: 'Wheel in the morning, farmers market at noon, cooking something slow for friends by dark.' },
         { label: 'I’m weirdly proud of', answer: 'A glaze I invented by accident. It’s the colour of a peach at 6 PM.' },
       ],
@@ -115,7 +129,7 @@ export function initialState(seeking: State['me']['seeking'] = 'men'): State {
       { id: cast.sealed, stage: 'sealed', since: '2026-10-08T18:40:00' },
     ],
     messages: {
-      [cast.yourTurn]: [
+      [cast.yourTurn]: SEED_CHATS[cast.yourTurn] ?? [
         { id: 'm1', from: 'aura', kind: 'system', text: 'Introduced Monday · Your Turn rules apply', at: '2026-10-12T19:02:00' },
         { id: 'm2', from: 'them', kind: 'voice', secs: 19, text: 'Hey! So Aura told me you invented a glaze by accident. I teach glazing to fifteen-year-olds and I have never once done that on purpose.', at: '2026-10-12T20:10:00' },
         { id: 'm3', from: 'me', kind: 'text', text: 'Ha! It was a happy disaster. Peach at 6 PM. What’s the worst one a student has made?', at: '2026-10-12T20:31:00' },
@@ -135,8 +149,8 @@ export function initialState(seeking: State['me']['seeking'] = 'men'): State {
     discreet: { veil: false, screenshotShield: true, hideNames: false, blocked: 6, sabbatical: false },
     settings: { auraMuted: false },
     notifications: [
-      { id: 'x1', title: 'Your Turn with Tomás', body: '31 hours left to reply. No pressure, just a nudge.', at: '2026-10-14T17:30:00', screen: 'conn/chat', params: { id: cast.yourTurn } },
-      { id: 'x2', title: 'Saturday is sealed', body: 'The Glasshouse, 1:00 PM. Your Date Pass is ready.', at: '2026-10-11T12:30:00', screen: 'dates/pass', params: { id: 'p-sealed' } },
+      { id: 'x1', title: `Your turn with ${PERSONAS[cast.yourTurn].first}`, body: '31 hours left to reply. No pressure, just a nudge.', at: '2026-10-14T17:30:00', screen: 'conn/chat', params: { id: cast.yourTurn } },
+      { id: 'x2', title: 'Saturday is sealed', body: 'The Glasshouse, 1:00 PM. Your Date Pass is ready.', at: '2026-10-11T12:30:00', screen: 'dates/pass', params: { id: cast.sealed } },
     ],
   }
 }
@@ -155,12 +169,13 @@ export const isDusk = (s: State) => s.phase !== 'afternoon'
 export const leadId = (s: State, params?: Record<string, any>) => (params?.id && PERSONAS[params.id] ? params.id : s.tonight.ids[0]) as string
 
 /** Three Evenings: deterministic proposals matched to both people's tastes. Minutes only, never addresses. */
-export function proposalsFor(s: State, id: string): Proposal[] {
+export function proposalsFor(s: State, id: string, weekOffset = 0): Proposal[] {
   const t = PERSONAS[id].traits.interests
   const rank: Record<string, number> = { lantern: 2, kiln: t.includes('ceramics') || t.includes('architecture') ? 3 : 1, oriole: t.includes('jazz') || t.includes('music') ? 3 : 1,
     sable: t.includes('food') ? 3 : 1, marrow: t.includes('cooking') || t.includes('food') ? 2 : 1, halcyon: t.includes('jazz') ? 2 : 0, glasshouse: 1, paperback: t.includes('writing') || t.includes('film') ? 2 : 1 }
   const picks = Object.entries(rank).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([v]) => v)
-  const slots = ['2026-10-16T20:00:00', '2026-10-17T19:30:00', '2026-10-18T12:30:00']
+  const shift = (iso: string) => new Date(new Date(iso).getTime() + weekOffset * 7 * 864e5 - new Date(iso).getTimezoneOffset() * 6e4).toISOString().slice(0, 19)
+  const slots = ['2026-10-16T20:00:00', '2026-10-17T19:30:00', '2026-10-18T12:30:00'].map(shift)
   const mins = [[21, 23], [19, 26], [24, 22]]
   return picks.map((venueId, i) => ({ venueId, when: slots[i], minsMe: mins[i][0], minsThem: mins[i][1] }))
 }
@@ -189,7 +204,13 @@ export function introduce(s: State, id: string, at = PHASE_TIME.dusk): State {
 
 export function send(s: State, id: string, m: Omit<Message, 'id' | 'at'>, at = PHASE_TIME.dusk): State {
   const msgs = [...(s.messages[id] ?? []), { ...m, id: uid('m'), at }]
-  const connections = s.connections.map(c => (c.id === id && c.stage === 'introduced' ? { ...c, stage: 'talking' as Stage } : c))
+  // Your Turn: sending passes the turn to them; their message gives you 48 hours.
+  const turn = m.from === 'me' ? undefined : m.from === 'them' ? new Date(new Date(at).getTime() + 48 * 3600e3).toISOString().slice(0, 19) : null
+  const connections = s.connections.map(c => {
+    if (c.id !== id) return c
+    const stage = c.stage === 'introduced' ? ('talking' as Stage) : c.stage
+    return turn === null ? { ...c, stage } : { ...c, stage, yourTurnUntil: turn }
+  })
   return { ...s, messages: { ...s.messages, [id]: msgs }, connections }
 }
 
